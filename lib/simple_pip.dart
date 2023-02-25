@@ -10,8 +10,7 @@ import 'package:simple_pip_mode/actions/pip_actions_layout.dart';
 /// request entering PIP mode,
 /// and call some callbacks when the app changes its mode.
 class SimplePip {
-  static const MethodChannel _channel =
-      MethodChannel('puntito.simple_pip_mode');
+  static const MethodChannel _channel = MethodChannel('puntito.simple_pip_mode');
 
   /// Whether this device supports PIP mode.
   static Future<bool> get isPipAvailable async {
@@ -46,14 +45,10 @@ class SimplePip {
     autoEnter = false,
     seamlessResize = false,
   }) async {
-    Map params = {
-      'aspectRatio': aspectRatio,
-      'autoEnter': autoEnter,
-      'seamlessResize': seamlessResize,
-    };
-    final bool? enteredSuccessfully =
-        await _channel.invokeMethod('enterPipMode', params);
-    return enteredSuccessfully ?? false;
+    Map params = {'aspectRatio': aspectRatio, 'seamlessResize': seamlessResize};
+    final autoEnterSuccessfully = await setAutoEnter(autoEnter: autoEnter);
+    final bool? enteredSuccessfully = await _channel.invokeMethod('enterPipMode', params);
+    return autoEnterSuccessfully && (enteredSuccessfully ?? false);
   }
 
   /// Request setting automatic PIP mode.
@@ -62,13 +57,15 @@ class SimplePip {
     aspectRatio = const [16, 9],
     seamlessResize = false,
   }) async {
-    Map params = {
-      'aspectRatio': aspectRatio,
-      'autoEnter': true,
-      'seamlessResize': seamlessResize,
-    };
-    final bool? setSuccessfully =
-        await _channel.invokeMethod('setAutoPipMode', params);
+    Map params = {'aspectRatio': aspectRatio, 'seamlessResize': seamlessResize};
+    final autoEnterSuccessfully = await setAutoEnter(autoEnter: true);
+    final bool? setSuccessfully = await _channel.invokeMethod('setAutoPipMode', params);
+    return autoEnterSuccessfully && (setSuccessfully ?? false);
+  }
+
+  Future<bool> setAutoEnter({bool autoEnter = false}) async {
+    Map params = {'autoEnter': autoEnter};
+    final bool? setSuccessfully = await _channel.invokeMethod('setAutoEnter', params);
     return setSuccessfully ?? false;
   }
 
@@ -76,8 +73,7 @@ class SimplePip {
   /// The preset layout is defined by [PipActionsLayout] and it's equivalent enum inside Android src
   Future<bool> setPipActionsLayout(PipActionsLayout layout) async {
     Map params = {'layout': layout.name};
-    final bool? setSuccessfully =
-        await _channel.invokeMethod('setPipLayout', params);
+    final bool? setSuccessfully = await _channel.invokeMethod('setPipLayout', params);
     return setSuccessfully ?? false;
   }
 
@@ -95,8 +91,7 @@ class SimplePip {
   /// Only affects media actions layout presets or presets that uses [PipAction.play] or [PipAction.pause] actions.
   Future<bool> setIsPlaying(bool isPlaying) async {
     Map params = {'isPlaying': isPlaying};
-    final bool? setSuccessfully =
-        await _channel.invokeMethod('setIsPlaying', params);
+    final bool? setSuccessfully = await _channel.invokeMethod('setIsPlaying', params);
     return setSuccessfully ?? false;
   }
 
@@ -113,8 +108,7 @@ class SimplePip {
               break;
             case 'onPipAction':
               String arg = call.arguments;
-              PipAction action =
-                  PipAction.values.firstWhere((e) => e.name == arg);
+              PipAction action = PipAction.values.firstWhere((e) => e.name == arg);
               onPipAction?.call(action);
               break;
           }
