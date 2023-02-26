@@ -92,7 +92,7 @@ class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         .setActions(actions)
 
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        params = params.setAutoEnterEnabled(this.autoEnter)
+        params = params.setAutoEnterEnabled(autoEnter)
           .setSeamlessResizeEnabled(seamlessResize!!)
       }
 
@@ -135,7 +135,7 @@ class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         val seamlessResize = call.argument<Boolean>("seamlessResize")
         val params = PictureInPictureParams.Builder()
           .setAspectRatio(Rational(aspectRatio!![0], aspectRatio[1]))
-          .setAutoEnterEnabled(this.autoEnter)
+          .setAutoEnterEnabled(autoEnter)
           .setSeamlessResizeEnabled(seamlessResize!!)
           .setActions(actions)
 
@@ -148,12 +148,16 @@ class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         result.error("NotImplemented", "System Version less than Android S found", "Expected Android S or newer.")
       }
     } else if(call.method == "setAutoEnter"){
-      this.autoEnter = call.argument<Boolean>("autoEnter")!!
-      val params = PictureInPictureParams.Builder()
-        .setAutoEnterEnabled(this.autoEnter)
-      this.params = params
-      activity.setPictureInPictureParams(params.build())
-      result.success(true)
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        autoEnter = call.argument<Boolean>("autoEnter")!!
+        val params = PictureInPictureParams.Builder()
+          .setAutoEnterEnabled(autoEnter)
+        this.params = params
+        if(params != null) activity.setPictureInPictureParams(params.build())
+        result.success(true)
+      } else {
+        result.error("NotImplemented", "System Version less than Android S found", "Expected Android S or newer.")
+      }
     } else {
       result.notImplemented()
     }
