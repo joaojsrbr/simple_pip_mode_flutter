@@ -149,6 +149,9 @@ class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       }
     } else if(call.method == "setAutoEnter"){
       this.autoEnter = call.argument<Boolean>("autoEnter")!!
+      var params = PictureInPictureParams.Builder()
+        .setAutoEnterEnabled(this.autoEnter)
+      this.params = params
       result.success(true)
     } else {
       result.notImplemented()
