@@ -30,18 +30,18 @@ class PipWidget extends StatefulWidget {
   final Widget Function(BuildContext)? pipBuilder;
   final Widget? pipChild;
   final PipActionsLayout? pipLayout;
-  const PipWidget(
-      {Key? key,
-      this.onPipEntered,
-      this.onPipExited,
-      this.onPipAction,
-      this.simplePip,
-      this.builder,
-      this.child,
-      this.pipBuilder,
-      this.pipChild,
-      this.pipLayout = PipActionsLayout.none})
-      : assert(child != null || builder != null),
+  const PipWidget({
+    Key? key,
+    this.onPipEntered,
+    this.onPipExited,
+    this.onPipAction,
+    this.simplePip,
+    this.builder,
+    this.child,
+    this.pipBuilder,
+    this.pipChild,
+    this.pipLayout,
+  })  : assert(child != null || builder != null),
         assert(pipChild != null || pipBuilder != null),
         super(key: key);
 
