@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 import 'dart:async';
 
 import 'package:flutter/services.dart';
@@ -29,15 +31,6 @@ class SimplePip {
     final bool? isActivated = await _channel.invokeMethod('isPipActivated');
     return isActivated ?? false;
   }
-
-  /// Called when the app enters PIP mode
-  VoidCallback? onPipEntered;
-
-  /// Called when the app exits PIP mode
-  VoidCallback? onPipExited;
-
-  /// Called when the user taps on a PIP action
-  Function(PipAction)? onPipAction;
 
   /// Request entering PIP mode
   Future<bool> enterPipMode({
@@ -95,25 +88,59 @@ class SimplePip {
     return setSuccessfully ?? false;
   }
 
-  SimplePip({this.onPipEntered, this.onPipExited, this.onPipAction}) {
-    if (onPipEntered != null || onPipExited != null || onPipAction != null) {
-      _channel.setMethodCallHandler(
-        (call) async {
-          switch (call.method) {
-            case 'onPipEntered':
-              onPipEntered?.call();
-              break;
-            case 'onPipExited':
-              onPipExited?.call();
-              break;
-            case 'onPipAction':
-              String arg = call.arguments;
-              PipAction action = PipAction.values.firstWhere((e) => e.name == arg);
-              onPipAction?.call(action);
-              break;
-          }
-        },
-      );
-    }
+  final StreamController<bool> _pipEntered = StreamController.broadcast();
+
+  final StreamController<bool> _pipPipExited = StreamController.broadcast();
+
+  final StreamController<PipAction> _pipPipAction = StreamController.broadcast();
+
+  /// Called when the app enters PIP mode
+  Stream<bool> get onPipEntered => _pipEntered.stream;
+
+  /// Called when the app exits PIP mode
+  Stream<bool> get onPipExited => _pipPipExited.stream;
+
+  /// Called when the user taps on a PIP action
+  Stream<PipAction> get onPipAction => _pipPipAction.stream;
+
+  void _setCallHandler() {
+    _channel.setMethodCallHandler(
+      (call) async {
+        switch (call.method) {
+          case CallMethod.PipEntered:
+            _pipEntered.add(true);
+            // onPipEntered?.call();
+            break;
+          case CallMethod.PipExited:
+            _pipPipExited.add(true);
+            // onPipExited?.call();
+            break;
+          case CallMethod.PipAction:
+            String arg = call.arguments;
+            PipAction action = PipAction.values.firstWhere((e) => e.name == arg);
+            _pipPipAction.add(action);
+            // onPipAction?.call(action);
+            break;
+        }
+      },
+    );
   }
+
+  SimplePip() {
+    _setCallHandler();
+  }
+
+  void dispose() {
+    _pipEntered.close();
+    _pipPipAction.close();
+
+    _pipPipExited.close();
+  }
+}
+
+class CallMethod {
+  const CallMethod._();
+  static const String PipEntered = 'onPipEntered';
+  static const String PipExited = 'onPipExited';
+  static const String PipAction = 'onPipAction';
 }

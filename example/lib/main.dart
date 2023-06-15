@@ -1,10 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:simple_pip_mode/actions/pip_action.dart';
 import 'package:simple_pip_mode/actions/pip_actions_layout.dart';
-import 'dart:async';
-
-import 'package:simple_pip_mode/simple_pip.dart'; // To enter pip mode and receive callbacks
 import 'package:simple_pip_mode/pip_widget.dart'; // To build pip mode dependent layouts
+import 'package:simple_pip_mode/simple_pip.dart'; // To enter pip mode and receive callbacks
 
 /// Some aspect ratio presets to choose
 const aspectRatios = [
@@ -205,10 +205,10 @@ class _ExampleAppState extends State<ExampleApp> {
               ),
               pipActionsLayout != PipActionsLayout.none
                   ? Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               const Text("Simulated player: "),
@@ -221,17 +221,17 @@ class _ExampleAppState extends State<ExampleApp> {
                                       actionResponse = "";
                                     });
                                   },
-                                  icon: Icon(
-                                      isPlaying ? Icons.pause : Icons.play_arrow))
+                                  icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow))
                             ],
                           ),
-                      ),
+                        ),
                         const Padding(
                           padding: EdgeInsets.all(16),
-                          child: Text("Obs.: Tap the simulated player button to see the PIP actions be updated on PIP mode, when you tap PIP actions on PIP mode it will reflect here too"),
+                          child: Text(
+                              "Obs.: Tap the simulated player button to see the PIP actions be updated on PIP mode, when you tap PIP actions on PIP mode it will reflect here too"),
                         )
-                    ],
-                  )
+                      ],
+                    )
                   : Container(),
             ],
           ),
@@ -258,9 +258,7 @@ class _ExampleAppState extends State<ExampleApp> {
                       },
                       icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow))
                   : Container(),
-              pipActionsLayout != PipActionsLayout.none
-                  ? Text(actionResponse)
-                  : Container(),
+              pipActionsLayout != PipActionsLayout.none ? Text(actionResponse) : Container(),
             ],
           ),
         ),
