@@ -29,7 +29,7 @@ class PipWidget extends StatefulWidget {
   final Widget? child;
   final Widget Function(BuildContext)? pipBuilder;
   final Widget? pipChild;
-  final PipActionsLayout pipLayout;
+  final PipActionsLayout? pipLayout;
   const PipWidget(
       {Key? key,
       this.onPipEntered,
@@ -68,7 +68,7 @@ class _PipWidgetState extends State<PipWidget> {
     _onPipEnteredSubscription = _pip.onPipEntered.listen(_onPipEntered);
     _onPipExitedSubscription = _pip.onPipExited.listen(_onPipExited);
     _onPipActionSubscription = _pip.onPipAction.listen(_onPipAction);
-    _pip.setPipActionsLayout(widget.pipLayout);
+    if (widget.pipLayout != null) _pip.setPipActionsLayout(widget.pipLayout!);
   }
 
   /// The app entered PIP mode
