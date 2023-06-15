@@ -2,6 +2,7 @@
 
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:simple_pip_mode/actions/pip_action.dart';
 import 'package:simple_pip_mode/actions/pip_actions_layout.dart';
@@ -88,53 +89,45 @@ class SimplePip {
     return setSuccessfully ?? false;
   }
 
-  final StreamController<bool> _pipEntered = StreamController.broadcast();
-
-  final StreamController<bool> _pipPipExited = StreamController.broadcast();
-
-  final StreamController<PipAction> _pipPipAction = StreamController.broadcast();
-
   /// Called when the app enters PIP mode
-  Stream<bool> get onPipEntered => _pipEntered.stream;
+  VoidCallback? onPipEntered;
 
-  /// Called when the app exits PIP mode
-  Stream<bool> get onPipExited => _pipPipExited.stream;
+  // /// Called when the app exits PIP mode
+  VoidCallback? onPipExited;
 
-  /// Called when the user taps on a PIP action
-  Stream<PipAction> get onPipAction => _pipPipAction.stream;
+  // /// Called when the user taps on a PIP action
+  void Function(PipAction)? onPipAction;
+
+  final ValueNotifier<bool> pipMode = ValueNotifier(false);
 
   void _setCallHandler() {
     _channel.setMethodCallHandler(
       (call) async {
         switch (call.method) {
           case CallMethod.PipEntered:
-            _pipEntered.add(true);
-            // onPipEntered?.call();
+            onPipEntered?.call();
+            pipMode.value = true;
             break;
           case CallMethod.PipExited:
-            _pipPipExited.add(true);
-            // onPipExited?.call();
+            onPipExited?.call();
+            pipMode.value = false;
             break;
           case CallMethod.PipAction:
             String arg = call.arguments;
             PipAction action = PipAction.values.firstWhere((e) => e.name == arg);
-            _pipPipAction.add(action);
-            // onPipAction?.call(action);
+            onPipAction?.call(action);
             break;
         }
       },
     );
   }
 
-  SimplePip() {
+  SimplePip({
+    this.onPipEntered,
+    this.onPipExited,
+    this.onPipAction,
+  }) {
     _setCallHandler();
-  }
-
-  void dispose() {
-    _pipEntered.close();
-    _pipPipAction.close();
-
-    _pipPipExited.close();
   }
 }
 

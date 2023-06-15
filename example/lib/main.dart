@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:simple_pip_mode/actions/pip_action.dart';
 import 'package:simple_pip_mode/actions/pip_actions_layout.dart';
 import 'package:simple_pip_mode/pip_widget.dart'; // To build pip mode dependent layouts
 import 'package:simple_pip_mode/simple_pip.dart'; // To enter pip mode and receive callbacks
@@ -75,47 +74,48 @@ class _ExampleAppState extends State<ExampleApp> {
     return MaterialApp(
       // Pip widget can build different widgets for each mode
       home: PipWidget(
+        simplePip: SimplePip(),
         // builder is null so child is used when not in pip mode
         pipLayout: pipActionsLayout,
-        onPipAction: (action) {
-          print("PIP ACTION TAP: " + action.name);
-          switch (action) {
-            case PipAction.play:
-              // example: videoPlayerController.play();
-              setState(() {
-                isPlaying = true;
-                actionResponse = "Playing";
-              });
-              break;
-            case PipAction.pause:
-              // example: videoPlayerController.pause();
-              setState(() {
-                isPlaying = false;
-                actionResponse = "Paused";
-              });
-              break;
-            case PipAction.live:
-              // example: videoPlayerController.forceLive();
-              setState(() {
-                actionResponse = "Go to live view";
-              });
-              break;
-            case PipAction.next:
-              // example: videoPlayerController.next();
-              setState(() {
-                actionResponse = "Next";
-              });
-              break;
-            case PipAction.previous:
-              // example: videoPlayerController.previous();
-              setState(() {
-                actionResponse = "Previous";
-              });
-              break;
-            default:
-              break;
-          }
-        },
+        // onPipAction: (action) {
+        //   print("PIP ACTION TAP: " + action.name);
+        //   switch (action) {
+        //     case PipAction.play:
+        //       // example: videoPlayerController.play();
+        //       setState(() {
+        //         isPlaying = true;
+        //         actionResponse = "Playing";
+        //       });
+        //       break;
+        //     case PipAction.pause:
+        //       // example: videoPlayerController.pause();
+        //       setState(() {
+        //         isPlaying = false;
+        //         actionResponse = "Paused";
+        //       });
+        //       break;
+        //     case PipAction.live:
+        //       // example: videoPlayerController.forceLive();
+        //       setState(() {
+        //         actionResponse = "Go to live view";
+        //       });
+        //       break;
+        //     case PipAction.next:
+        //       // example: videoPlayerController.next();
+        //       setState(() {
+        //         actionResponse = "Next";
+        //       });
+        //       break;
+        //     case PipAction.previous:
+        //       // example: videoPlayerController.previous();
+        //       setState(() {
+        //         actionResponse = "Previous";
+        //       });
+        //       break;
+        //     default:
+        //       break;
+        //   }
+        // },
         child: Scaffold(
           appBar: AppBar(
             title: const Text('Pip Plugin example app'),
