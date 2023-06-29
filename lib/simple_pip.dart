@@ -2,8 +2,8 @@
 
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_meedu/meedu.dart';
 import 'package:simple_pip_mode/actions/pip_action.dart';
 import 'package:simple_pip_mode/actions/pip_actions_layout.dart';
 
@@ -89,50 +89,50 @@ class SimplePip {
     return setSuccessfully ?? false;
   }
 
-  /// Called when the app enters PIP mode
-  VoidCallback? onPipEntered;
+  final Rx<PipState> _onPipChange = PipState.none.obs;
 
-  // /// Called when the app exits PIP mode
-  VoidCallback? onPipExited;
+  final Rx<PipAction> _onPipAction = PipAction.none.obs;
 
-  // /// Called when the user taps on a PIP action
-  void Function(PipAction)? onPipAction;
+  Stream<PipState> get onPipChange => _onPipChange.stream;
 
-  final ValueNotifier<bool> pipMode = ValueNotifier(false);
+  Stream<PipAction> get onPipAction => _onPipAction.stream;
 
   void _setCallHandler() {
     _channel.setMethodCallHandler(
       (call) async {
         switch (call.method) {
-          case CallMethod.PipEntered:
-            onPipEntered?.call();
-            pipMode.value = true;
+          case _CallMethod.PipEntered:
+            _onPipChange.value = PipState.pipEntered;
             break;
-          case CallMethod.PipExited:
-            onPipExited?.call();
-            pipMode.value = false;
+          case _CallMethod.PipExited:
+            _onPipChange.value = PipState.pipExited;
             break;
-          case CallMethod.PipAction:
+          case _CallMethod.PipAction:
             String arg = call.arguments;
             PipAction action = PipAction.values.firstWhere((e) => e.name == arg);
-            onPipAction?.call(action);
+            _onPipAction.value = action;
             break;
         }
       },
     );
   }
 
-  SimplePip({
-    this.onPipEntered,
-    this.onPipExited,
-    this.onPipAction,
-  }) {
+  SimplePip._internal() {
     _setCallHandler();
+  }
+
+  static SimplePip instance = SimplePip._internal();
+
+  void dispose() {
+    _onPipChange.close();
+    _onPipAction.close();
   }
 }
 
-class CallMethod {
-  const CallMethod._();
+enum PipState { pipEntered, pipExited, none }
+
+class _CallMethod {
+  const _CallMethod._();
   static const String PipEntered = 'onPipEntered';
   static const String PipExited = 'onPipExited';
   static const String PipAction = 'onPipAction';
